@@ -37,7 +37,7 @@ protected:
 class CTail : public CObjectSnake
 {
 public:
-	CTail();
+	CTail(CRect rc);
 	CTail(CRect rc, eMoveto dir);
 	virtual ~CTail();
 	int index; //номер элемента

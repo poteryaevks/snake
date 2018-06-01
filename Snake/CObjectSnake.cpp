@@ -90,9 +90,10 @@ void CObjectSnake::move_left()
 CTail* CTail::pFirst = 0;
 
 
-CTail::CTail()
+CTail::CTail(CRect rc)
 	:pNext(0)
 {
+	rect.SetRect(rc.right - 20, rc.top, rc.left - 60, rc.bottom);
 	pFirst = this;
 }
 
@@ -128,6 +129,7 @@ void CTail::move_left()
 {
 	rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c() - 20, get_coordinate_d());
 }
+
 
 
 
@@ -171,19 +173,19 @@ void CTail::decrease(eMoveto edist)
 	switch (edist)
 	{
 	case left:
-		rect.SetRect(get_coordinate_a() + 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() + 20, get_coordinate_d());
 		break;
 
 	case right:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() - 20, get_coordinate_d());
+		rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
 		break;
 
 	case bottom:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() - 20);
+		rect.SetRect(get_coordinate_a(), get_coordinate_b() + 20, get_coordinate_c(), get_coordinate_d());
 		break;
 
 	case top:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b() + 20, get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() - 20);
 		break;
 
 	default:
@@ -243,3 +245,5 @@ void CTail::clearlist()
 		delete temp_pnt[i];
 	}
 }
+
+

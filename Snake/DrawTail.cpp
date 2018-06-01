@@ -7,10 +7,9 @@
 
 CDrawTail::CDrawTail(CObjectSnake* hd)
 	:count(0),
-	pSnake_tail()
+	Snake_tail(hd->rect)
 {
-	pSnake_tail.rect.SetRect(hd->rect.right, hd->rect.top, hd->rect.left, hd->rect.bottom);
-	snake_head = hd; //первый элемент списка
+	pSnake_head = hd; //первый элемент списка
 }
 
 
@@ -24,29 +23,29 @@ void CDrawTail::AddElem(CObjectSnake* hd, eMoveto from, eMoveto to)//если было и
 {
 	CTail* newtail;
 
-	snake_head = hd;
+	pSnake_head = hd;
 	eMoveto etemp = MovementCard[from][to];
 	switch (etemp)
 	{
 	case top:
-		snake_head->set_direction(top);
-		newtail = pSnake_tail.getData(snake_head->rect, snake_head->get_direction());
-		pSnake_tail.addToList(newtail);
+		pSnake_head->set_direction(top);
+		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
+		Snake_tail.addToList(newtail);
 		break;
 	case bottom:
-		snake_head->set_direction(bottom);
-		newtail = pSnake_tail.getData(snake_head->rect, snake_head->get_direction());
-		pSnake_tail.addToList(newtail);
+		pSnake_head->set_direction(bottom);
+		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
+		Snake_tail.addToList(newtail);
 		break;
 	case left:
-		snake_head->set_direction(left);
-		newtail = pSnake_tail.getData(snake_head->rect, snake_head->get_direction());
-		pSnake_tail.addToList(newtail);
+		pSnake_head->set_direction(left);
+		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
+		Snake_tail.addToList(newtail);
 		break;
 	case right:
-		snake_head->set_direction(right);
-		newtail = pSnake_tail.getData(snake_head->rect, snake_head->get_direction());
-		pSnake_tail.addToList(newtail);
+		pSnake_head->set_direction(right);
+		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
+		Snake_tail.addToList(newtail);
 		break;
 
 	default:
@@ -82,27 +81,51 @@ void CDrawTail::ChangeRect(CObjectSnake* hd)
 			hd->move_left();
 		}
 
-		CTail* temp = pSnake_tail.pFirst;
+		CTail* temp = Snake_tail.pFirst;
 		//движение  хвоста змейки
-		while (temp->pNext)
+		if (temp == Snake_tail.pFirst)
+	
+			temp->decrease(reverse(temp->get_direction()));
+		
+	    if (checktail())
 		{
-			if (temp == pSnake_tail.pFirst)
-			{
-		//		temp->decrease(reverse(hd->get_direction()));
-			}
-
-			temp = temp->pNext;
+			taildelete(); //удаление первого элеменыта присвоение второму номер один 
 		}
+	
+
+		while (temp->pNext)		
+		{
+			temp = temp->pNext;
+		} 
 
 		if(temp->pNext == 0)
-		{
 			temp->increase(hd->get_direction());
-		}
-
+		
 
 		
 	
 }
+
+
+bool CDrawTail::checktail() //if true -> delete
+{
+	if (Snake_tail.pFirst->rect.left == Snake_tail.pFirst->rect.right
+				|| Snake_tail.pFirst->rect.bottom == Snake_tail.pFirst->rect.top)
+			{
+				return TRUE;
+			}
+	return FALSE;
+}
+
+void CDrawTail::taildelete()
+{
+	CTail* temp;
+	temp = Snake_tail.pFirst;
+	temp->pFirst = temp->pNext;
+		
+	//delete Snake_tail.pFirst;
+}
+
 
 
 eMoveto CDrawTail::reverse(eMoveto in)

@@ -15,9 +15,10 @@ public:
 
 	void AddElem(CObjectSnake* hd, eMoveto from, eMoveto to);
 	eMoveto reverse(eMoveto in);
-
-	CObjectSnake* snake_head;
-	CTail pSnake_tail; //первый элемент списка
+	void taildelete();
+	bool checktail();
+	CObjectSnake* pSnake_head;
+	CTail Snake_tail; //первый элемент списка
 	void ChangeRect(CObjectSnake* hd);
 private:
 	int count;
