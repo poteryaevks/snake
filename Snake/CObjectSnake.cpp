@@ -25,28 +25,7 @@ eMoveto CObjectSnake::get_direction()
 
 void CObjectSnake::set_direction(eMoveto edist)
 {
-	if (edist != m_ddirection)
-	{
-		Draw.AddElem(this, m_ddirection, edist);
-	}
-	switch (edist)
-	{
-	case top:
-		m_ddirection = top;
-		break;
-
-	case bottom:
-		m_ddirection = bottom;
-		break;
-
-	case left:
-		m_ddirection = left;
-		break;
-
-	case right:
-		m_ddirection = right;
-		break;
-	}
+	m_ddirection = edist;	
 }
 
 
@@ -117,10 +96,11 @@ CTail::CTail()
 	pFirst = this;
 }
 
-CTail::CTail(CRect rc)
+CTail::CTail(CRect rc, eMoveto dir)
 	: pNext(0)
 {
 	rect.SetRect(rc.right, rc.top, rc.left, rc.bottom);
+	m_ddirection = dir;
 }
 
 
@@ -163,19 +143,19 @@ void CTail::increase(eMoveto edist)
 	switch (edist)
 	{
 	case left:
-		rect.SetRect(get_coordinate_a() - 1, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
 		break;
 
 	case right:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() + 1, get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() + 20, get_coordinate_d());
 		break;
 
 	case bottom:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() + 1);
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() + 20);
 		break;
 
 	case top:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b() - 1, get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b() - 20, get_coordinate_c(), get_coordinate_d());
 		break;
 		
 	default:
@@ -191,19 +171,19 @@ void CTail::decrease(eMoveto edist)
 	switch (edist)
 	{
 	case left:
-		rect.SetRect(get_coordinate_a() + 1, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a() + 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
 		break;
 
 	case right:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() - 1, get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() - 20, get_coordinate_d());
 		break;
 
 	case bottom:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() - 1);
+		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c(), get_coordinate_d() - 20);
 		break;
 
 	case top:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b() + 1, get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a(), get_coordinate_b() + 20, get_coordinate_c(), get_coordinate_d());
 		break;
 
 	default:
@@ -237,10 +217,10 @@ void CTail::addToList(CTail* pnt)
 }
 
 
-CTail* CTail::getData(CRect rect)
+CTail* CTail::getData(CRect rect, eMoveto dir)
 {
 	// создаем новый объект для заполнения
-	CTail* pnt = new CTail(rect);
+	CTail* pnt = new CTail(rect, dir);
 	// обнулим указатель на следующий элемент
 	pnt->pNext = 0;
 	// Еернем адрес созданного объекта

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
-#include "CObjectSnake.h"
+
 
 //класс прорисовки хвоста
 
@@ -11,35 +10,28 @@
 class CDrawTail
 {
 public:
-	CDrawTail();
+	CDrawTail(CObjectSnake* hd);
 	~CDrawTail();
 
 	void AddElem(CObjectSnake* hd, eMoveto from, eMoveto to);
-	void RightToTop();
+	eMoveto reverse(eMoveto in);
 
 	CObjectSnake* snake_head;
 	CTail pSnake_tail; //первый элемент списка
-
+	void ChangeRect(CObjectSnake* hd);
 private:
 	int count;
 };
 
 
 
-const eMoveto MovementCard[8][3] =
+
+const eMoveto MovementCard[4][4] =
 {
-/*    |  |   |    | |   | |    | */
-/*   */{ right, bottom,  bottom },
-/*   */{ right, top,     top },
-/*   */{ left,  top,     top },
-/*   */{ left,  bottom,  bottom },
-/*   */{ bottom, right,  right },
-/*   */{ bottom, left,   left },
-/*   */{ top, left,      left },
-/*   */{ top, right,     right },
+	/*      | r |   | l |    | t |    | b | */
+	/* r */{ right,  right,    top,  bottom },
+	/* l */{ left,  left,    top,   bottom },
+	/* t */{ right, left,     top,    top },
+	/* b */{ right, left,  bottom,    bottom }
 };
 
-
-
-
-extern CDrawTail Draw;

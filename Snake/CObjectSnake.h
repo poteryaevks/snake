@@ -1,14 +1,6 @@
 #pragma once
 
-
-
-
-
- 
-class CDrawTail;
-
-
-////////////////////////////////////
+ ////////////////////////////////////
 class CObjectSnake
 {
 public:
@@ -46,7 +38,7 @@ class CTail : public CObjectSnake
 {
 public:
 	CTail();
-	CTail(CRect rc);
+	CTail(CRect rc, eMoveto dir);
 	virtual ~CTail();
 	int index; //номер элемента
 	int get_count();
@@ -60,14 +52,17 @@ public:
 	virtual void move_left();
 
 	
-	CTail* getData(CRect rc);
+	CTail* getData(CRect rect, eMoveto dir);
 	void addToList(CTail* pTAIL);
 	void removeFromList();  //удалить из списка
 	void clearlist();
-private:
-	static int count; //число хвостов
+
 	void increase(eMoveto edist); //увеличение длины на 1 
 	void decrease(eMoveto edist); //снижение длины на 1
+
+private:
+	static int count; //число хвостов
+	
 };
 
 ////////////////////////////////////////////
