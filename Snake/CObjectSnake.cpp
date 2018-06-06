@@ -2,6 +2,7 @@
 #include "CObjectSnake.h"
 #include "DrawTail.h"
 
+
 CObjectSnake::CObjectSnake()
 	:m_ddirection(right),
 	m_dspeed(0),
@@ -9,9 +10,9 @@ CObjectSnake::CObjectSnake()
 	m_dcoordinate{ 200, 400, 220, 420 }
 {
 	rect.SetRect(m_dcoordinate[0],
-		m_dcoordinate[1],
-		m_dcoordinate[2],
-		m_dcoordinate[3]);
+		         m_dcoordinate[1],
+		         m_dcoordinate[2],
+		         m_dcoordinate[3]);
 }
 
 CObjectSnake::~CObjectSnake()
@@ -83,23 +84,33 @@ void CObjectSnake::move_left()
 	rect.OffsetRect(-20, 0);
 }
 
+CRect CObjectSnake::get_rect()
+{
+	return rect;
+}
 
 
 
 ///////////////////////////////////Tail//////////////////////////////////////////
-CTail* CTail::pFirst = 0;
-
-
+//CTail* CTail::pFirst = 0;
 CTail::CTail(CRect rc)
 	:pNext(0)
 {
-	rect.SetRect(rc.right - 20, rc.top, rc.left - 60, rc.bottom);
-	pFirst = this;
+	rect.SetRect(rc.right, rc.top, rc.left - 60, rc.bottom);
+    pFirst = this;
 }
+
+bool CTail::flag = TRUE;
 
 CTail::CTail(CRect rc, eMoveto dir)
 	: pNext(0)
 {
+	if (flag)
+	{
+		rect.SetRect(rc.right, rc.top, rc.left - 60, rc.bottom);
+		flag = FALSE;
+	}
+	else
 	rect.SetRect(rc.right, rc.top, rc.left, rc.bottom);
 	m_ddirection = dir;
 }
@@ -132,24 +143,16 @@ void CTail::move_left()
 
 
 
-
-
-int CTail::get_count()
-{
-	return count;
-}
-
-
 void CTail::increase(eMoveto edist)
 {
 	switch (edist)
 	{
 	case left:
-		rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a() , get_coordinate_b(), get_coordinate_c() - 20, get_coordinate_d());
 		break;
 
 	case right:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() + 20, get_coordinate_d());
+		rect.SetRect(get_coordinate_a() + 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
 		break;
 
 	case bottom:
@@ -173,11 +176,11 @@ void CTail::decrease(eMoveto edist)
 	switch (edist)
 	{
 	case left:
-		rect.SetRect(get_coordinate_a(), get_coordinate_b(), get_coordinate_c() + 20, get_coordinate_d());
+		rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c() , get_coordinate_d());
 		break;
 
 	case right:
-		rect.SetRect(get_coordinate_a() - 20, get_coordinate_b(), get_coordinate_c(), get_coordinate_d());
+		rect.SetRect(get_coordinate_a() , get_coordinate_b(), get_coordinate_c() + 20, get_coordinate_d());
 		break;
 
 	case bottom:
@@ -193,57 +196,5 @@ void CTail::decrease(eMoveto edist)
 	}
 }
 
-
-void CTail::removeFromList() //удаляем первый элемент
-{
-
-}
-
-int CTail::count = 0;
-
-
-void CTail::addToList(CTail* pnt)
-{
-	if (pFirst == 0)
-	{
-		pFirst = this;
-	}
-	CTail* pCurrent = pFirst;
-	while (pCurrent->pNext)
-	{
-		pCurrent = pCurrent->pNext;
-	}
-	// добавим текущий элемент к концу списка
-	pCurrent->pNext = pnt;
-	count++;
-}
-
-
-CTail* CTail::getData(CRect rect, eMoveto dir)
-{
-	// создаем новый объект для заполнения
-	CTail* pnt = new CTail(rect, dir);
-	// обнулим указатель на следующий элемент
-	pnt->pNext = 0;
-	// Еернем адрес созданного объекта
-	return pnt;
-}
-
-void CTail::clearlist()
-{
-	CTail* temp_pnt[1024];
-	temp_pnt[0] = this;
-
-	while (temp_pnt[count]->pNext)
-	{
-		count++;
-		temp_pnt[count] = temp_pnt[count - 1]->pNext;
-	}
-
-	for (size_t i = 1; i <= count; ++i)
-	{
-		delete temp_pnt[i];
-	}
-}
 
 

@@ -1,131 +1,168 @@
 #include "stdafx.h"
 #include "CObjectSnake.h"
+#include "LinkList.h"
 #include "DrawTail.h"
 
 
-
-
 CDrawTail::CDrawTail(CObjectSnake* hd)
-	:count(0),
-	Snake_tail(hd->rect)
 {
-	pSnake_head = hd; //первый элемент списка
+	CTail* pnt = m_Tsnake_tail.getData(hd->get_rect(), hd->get_direction());
+	m_ePrev_dir = right;
 }
 
 
 CDrawTail::~CDrawTail()
 {
-
 }
 
 
-void CDrawTail::AddElem(CObjectSnake* hd, eMoveto from, eMoveto to)//если было изменение направления 
+bool CDrawTail::direction_changed(eMoveto to)
+{
+	if (to != m_ePrev_dir)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+
+void CDrawTail::add_elem(CObjectSnake* hd, eMoveto from, eMoveto to)//если было изменение направления 
 {
 	CTail* newtail;
+	eMoveto etemp = m_eMovementCard[from][to];
 
-	pSnake_head = hd;
-	eMoveto etemp = MovementCard[from][to];
 	switch (etemp)
 	{
 	case top:
-		pSnake_head->set_direction(top);
-		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
-		Snake_tail.addToList(newtail);
-		break;
-	case bottom:
-		pSnake_head->set_direction(bottom);
-		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
-		Snake_tail.addToList(newtail);
-		break;
-	case left:
-		pSnake_head->set_direction(left);
-		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
-		Snake_tail.addToList(newtail);
-		break;
-	case right:
-		pSnake_head->set_direction(right);
-		newtail = Snake_tail.getData(pSnake_head->rect, pSnake_head->get_direction());
-		Snake_tail.addToList(newtail);
+
+		if (check_tail())
+			m_Tsnake_tail.deletefromlist();
+				
+		m_Tsnake_tail.first->decrease(m_Tsnake_tail.first->get_direction());
+		hd->set_direction(top);
+		hd->move_top();
+		newtail = m_Tsnake_tail.getData(hd->get_rect(), hd->get_direction());
+		m_Tsnake_tail.addToList(newtail);
+		
 		break;
 
-	default:
+	case bottom:
+
+		if (check_tail())
+			m_Tsnake_tail.deletefromlist();
+		
+		m_Tsnake_tail.first->decrease(m_Tsnake_tail.first->get_direction());
+		hd->set_direction(bottom);
+		hd->move_bottom();
+		newtail = m_Tsnake_tail.getData(hd->get_rect(), hd->get_direction());
+		m_Tsnake_tail.addToList(newtail);
 		break;
+
+	case left:
+
+		if (check_tail())
+			m_Tsnake_tail.deletefromlist();
+		
+		m_Tsnake_tail.first->decrease(m_Tsnake_tail.first->get_direction());
+		hd->set_direction(left);
+		hd->move_left();
+		newtail = m_Tsnake_tail.getData(hd->get_rect(), hd->get_direction());
+		m_Tsnake_tail.addToList(newtail);
+		break;
+
+	case right:
+
+		if (check_tail())
+			m_Tsnake_tail.deletefromlist();
+		
+		m_Tsnake_tail.first->decrease(m_Tsnake_tail.first->get_direction());
+		hd->set_direction(right);
+		hd->move_right();
+		newtail = m_Tsnake_tail.getData(hd->get_rect(), hd->get_direction());
+		m_Tsnake_tail.addToList(newtail);
+		break;
+	}
+
+	m_bmoved = TRUE;
+}
+
+
+void CDrawTail::change_rect()
+{
+	//движение головы змейки 
+	if (m_pTsnake_head->get_direction() == top)
+	{
+		m_pTsnake_head->move_top();
+	}
+
+	if (m_pTsnake_head->get_direction() == bottom)
+	{
+		m_pTsnake_head->move_bottom();
+	}
+
+	if (m_pTsnake_head->get_direction() == right)
+	{
+		m_pTsnake_head->move_right();
+	}
+
+	if (m_pTsnake_head->get_direction() == left)
+	{
+		m_pTsnake_head->move_left();
+	}
+
+	//движение  хвоста змейки
+	CTail* temp = m_Tsnake_tail.first;
+    
+	if (check_tail())
+	{
+		m_Tsnake_tail.deletefromlist();
+		temp = m_Tsnake_tail.first;
+		temp->decrease(temp->get_direction());
+	}
+	else
+		m_Tsnake_tail.first->decrease(m_Tsnake_tail.first->get_direction());
+
+	while (temp->pNext)
+		temp = temp->pNext;
+
+	if (temp->pNext == 0)
+		temp->increase(m_pTsnake_head->get_direction());
+}
+
+
+void CDrawTail::on_idle(CObjectSnake* phd, CTailList** plist, bool* gameover)
+{
+	eMoveto newdir = phd->get_direction();
+	m_bmoved = FALSE;
+	
+	if (direction_changed(newdir))
+	{
+		add_elem(m_pTsnake_head, newdir, newdir);
+		m_ePrev_dir = newdir;
+	}
+	*plist = &m_Tsnake_tail;
+	m_pTsnake_head = phd;  //присвоили новую голову
+	if(!m_bmoved)
+	change_rect(); //изменили положения элементов
+	
+	if (phd->get_rect().bottom == 440 //вышли за рамки, прекратить игру
+		|| phd->get_rect().top == 0
+		|| phd->get_rect().right == 480
+		|| phd->get_rect().left == 0)
+	{
+		*gameover = TRUE;
+		return;
 	}
 }
 
 
-
-void CDrawTail::ChangeRect(CObjectSnake* hd)
+bool CDrawTail::check_tail() //if true -> delete tail
 {
-
-	// процесс обработки в новом топоке
-	
-		//движение головы змейки 
-		if (hd->get_direction() == top)
-		{
-			hd->move_top();
-		}
-
-		if (hd->get_direction() == bottom)
-		{
-			hd->move_bottom();
-		}
-
-		if (hd->get_direction() == right)
-		{
-			hd->move_right();
-		}
-
-		if (hd->get_direction() == left)
-		{
-			hd->move_left();
-		}
-
-		CTail* temp = Snake_tail.pFirst;
-		//движение  хвоста змейки
-		if (temp == Snake_tail.pFirst)
-	
-			temp->decrease(reverse(temp->get_direction()));
-		
-	    if (checktail())
-		{
-			taildelete(); //удаление первого элеменыта присвоение второму номер один 
-		}
-	
-
-		while (temp->pNext)		
-		{
-			temp = temp->pNext;
-		} 
-
-		if(temp->pNext == 0)
-			temp->increase(hd->get_direction());
-		
-
-		
-	
+	if ((m_Tsnake_tail.first->get_rect().left == m_Tsnake_tail.first->get_rect().right)
+		|| (m_Tsnake_tail.first->get_rect().bottom == m_Tsnake_tail.first->get_rect().top))
+		return TRUE;
+	else
+		return FALSE;
 }
-
-
-bool CDrawTail::checktail() //if true -> delete
-{
-	if (Snake_tail.pFirst->rect.left == Snake_tail.pFirst->rect.right
-				|| Snake_tail.pFirst->rect.bottom == Snake_tail.pFirst->rect.top)
-			{
-				return TRUE;
-			}
-	return FALSE;
-}
-
-void CDrawTail::taildelete()
-{
-	CTail* temp;
-	temp = Snake_tail.pFirst;
-	temp->pFirst = temp->pNext;
-		
-	//delete Snake_tail.pFirst;
-}
-
 
 
 eMoveto CDrawTail::reverse(eMoveto in)
@@ -141,4 +178,5 @@ eMoveto CDrawTail::reverse(eMoveto in)
 	case bottom:
 		return top;
 	}
+	return right;
 }
